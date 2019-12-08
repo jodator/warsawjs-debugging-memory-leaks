@@ -58,3 +58,15 @@ body {
 .slide.compact {
     padding: 50px;
 }
+
+.slide ul {
+    margin-left: 1em;
+}
+
+.slide .reference {
+    font-size: 0.8em;
+}
+
+.slide .reference a {
+    color: #555;
+}

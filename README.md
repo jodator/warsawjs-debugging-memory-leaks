@@ -1,10 +1,10 @@
-# WarsawJS Meetup: Slides template
+# WarsawJS Meetup: Debugging memory leaks
 
 :clipboard: Slides for `WarsawJS Meetup`
 
 ## Preview
 
-<https://warsawjs.github.io/meetup-slides-template>
+<https://jodator.github.io/warsawjs-debugging-memory-leaks/#>
 
 ## :bulb: How to use this template?
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>WarsawJS Meetup: Slides template</title>
+    <title>WarsawJS Meetup: Debugging memory leaks</title>
 
     <meta charset="utf-8"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
@@ -20,7 +20,7 @@
 </head>
 <body class="shower list">
     <header class="caption">
-        <h1>WarsawJS Meetup: Slides template</h1>
+        <h1>WarsawJS Meetup: Debugging memory leaks</h1>
         <p>We talk about JavaScript. Each month in Warsaw, Poland.</p>
     </header>
 
@@ -31,20 +31,183 @@
         </div>
         <div class="details">
             <!-- 1. Avatar -->
-            <img src="images/my-avatar.jpg" alt="Speaker"/>
+            <img src="images/mg.png" alt="Speaker" width="200"/>
 
             <!-- 2. Speaker -->
-            <h2>Speaker name</h2>
+            <h2>Maciej Gołaszewski</h2>
 
             <!-- 3. Presentation title -->
-            <h2><strong>"WarsawJS Meetup: Slides template" [PL/EN]</strong></h2>
+            <h2><strong>"WarsawJS Meetup: Debugging memory leaks" [EN]</strong></h2>
 
             <!-- 4. Presentation date -->
-            <h2>2018-XX-XX</h2>
+            <h2>2019-12-12</h2>
 
             <!-- 5. Contact the speaker -->
-            <h2><a href="http://twitter.com/speaker">@speaker</a></h2>
+            <h2><a href="http://twitter.com/jodator">@jodator</a></h2>
         </div>
+    </section>
+
+    <section class="slide compact">
+        <h2>Memory management in JavaScript</h2>
+        <p>JavaScript automatically allocates memory when objects are created.</p>
+        <p>It also automatically frees memory when those objects are no longer used in a process called <i>garbage collection</i></p>
+
+        Automaticity - when/why? (confusion) ([img](https://i.imgflip.com/2slo9z.png)) Sup! The JavaScript will handle this for me! Wrong!
+    </section>
+
+    <section class="slide compact">
+        <h2>JavaScript Memory life-cycle</h2>
+        <h3>in 3 easy steps</h3>
+
+        <ol>
+            <li class="next">allocate</li>
+            <li class="next">use</li>
+            <li class="next">release</li>
+        </ol>
+    </section>
+
+    <section class="slide compact">
+        <h2>Step 1: Allocate</h2>
+
+        <p>JavaScript automatically allocate memory when values are initially declared:</p>
+
+        <ul>
+            <li>primitives like <code>Number</code> or <code>String</code></li>
+            <li>for <code>Object</code> & <code>Array</code> - for the object/array and contained values</li>
+            <li>Function declaration (<code>() => {}</code>) allocates a callable object (<code>Function</code>)</li>
+            <li>Object creation <code>new Foo()</code>, <code>new Date()</code>, etc...</li>
+            <li>Element creation - <code>document.createElement( 'div' )</code></li>
+            <li>array and string methods like <code>array.concat( otherArray )</code>, <code>'JavaScript'.substr( 0, 4 )</code></li>
+        </ul>
+
+    </section>
+
+    <section class="slide compact">
+        <h2>Step 2: Use</h2>
+
+        <p>...</p>
+    </section>
+
+    <section class="slide compact">
+        <h2>Step 3: Release</h2>
+
+        <p>How do Garbage Collector decides if some memory is not needed anymore?</p>
+
+        Reference - one object reference another if the former has access to the latter (implicitly or explicitly).
+
+        - implicitly - ie to its prototype
+        - to its properties values
+
+        <p>This means that object in memory management is considered with it function or lexical scope (so what's visible in current
+            position
+            in execution stack).</p>
+        <!-- TODO -->
+        ## How JavaScript detects memory to free?
+
+        Meet the "Mark-and-sweep algorithm"
+
+        IMG
+
+        The "object no longer needed" is an "unreachable object".
+
+        We assume well-known set of objects "roots". In JavaScript it is the *global* object (AKA window).
+
+        The M&S periodically start from a root and find all objects referenced from these roots, then objects referenced by these and so on.
+
+        When going from root to all objects the Garbage Collector will find all non-reachable.
+
+        All modern browsers comes with mark-and-sweep garbage collector (with some improvements - but the general idea of an object that is
+        no longer need stays the same.
+
+        function foo() {
+        const x = "foo";
+        return "baz";
+        }
+
+        foo();
+    </section>
+
+    <section class="slide compact">
+        <h2>Releasing the memory</h2>
+        <blockquote>
+            As of 2019 We cannot release memory manually (call garbage collector).
+        </blockquote>
+
+        <p>That's true, but:</p>
+        <ul>
+            <li>In Node.js you can increase heap memory <code>node --max-old-space-size=9001 index.js</code>.</li>
+            <li>For Chrome there's <code>--expose gc</code> flag for exposing <code>window.gc()</code> method.</li>
+        </ul>
+    </section>
+
+    <section class="slide compact">
+        <h2>Common causes of memory leaks</h2>
+
+        <ul>
+            <li>globals</li>
+            <li>globals!</li>
+            <li>shared lexical scope</li>
+            <li>forgotten callbacks</li>
+            <li>forgotten DOM nodes</li>
+        </ul>
+
+        <p class="reference">Ref: <a href="https://blog.meteor.com/an-interesting-kind-of-javascript-memory-leak-8b47d2e7f156"
+                                     target="_blank" rel="noopener noreferrer">An interesting kind of JavaScript memory leak</a>.</p>
+    </section>
+
+    <section class="slide compact">
+        ## Tools - how to find memory leaks
+
+        - Google Chrome dev tools
+        - Firefox dev tools
+        - `window.performance.memory`
+    </section>
+
+    <section class="slide compact">
+        <h2>Detecting memory leaks: demos</h2>
+    </section>
+
+    <section class="slide compact">
+        <h2>ProTips™</h2>
+
+        <ul>
+            <li>be careful with anonymous functions for callbacks (if scope is shared)</li>
+            <li>pass only what you need - big objects - retentions</li>
+            <li>de-register callbacks</li>
+            <li>consider using `WeakMap` instead of `Map`</li>
+            <li>GC must pause execution to collect garbage - so if you experience lags - it might be this.</li>
+            <li>if in doubt - measure</li>
+            <li>when testing - disable all addons</li>
+        </ul>
+
+    </section>
+
+    <section class="slide prism">
+        <h2>Disabling addons - Chrome</h2>
+
+        <pre>
+            <code class="language-javascript line-numbers">
+            google-chrome \
+                --enable-precise-memory-info \
+                --disable-extensions \
+                --disable-plugins \
+                --incognito
+                http://example.com</code>
+        </pre>
+    </section>
+
+    <section class="slide prism">
+        <h2>Disabling addons - Firefox</h2>
+
+        <pre>
+            <code class="language-javascript line-numbers">
+            firefox \
+                -P "empty" \
+                --new-instance \
+                --safe-mode \
+                http://localhost:8125
+            </code>
+        </pre>
     </section>
 
     <section class="slide compact">
@@ -314,7 +477,7 @@
     <div class="progress"></div>
 
     <footer class="badge">
-        <a href="https://github.com/warsawjs/warsawjs-slides-template">Fork me on GitHub</a>
+        <a href="https://github.com/jodator/warsawjs-debugging-memory-leaks">Fork me on GitHub</a>
     </footer>
 
     <footer class="badge badge-top-left">
