@@ -1,7 +1,8 @@
 @charset "utf-8";
 
 
-.slide ul {
+.slide ul,
+.slide ol  {
     margin-left: 1em;
 }
 

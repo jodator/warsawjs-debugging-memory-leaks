@@ -52,35 +52,31 @@
 
     <section class="slide compact">
         <h2>Memory management in JavaScript</h2>
-        <p>JavaScript automatically allocates memory when objects are created.</p>
-        <p>It also automatically frees memory when those objects are no longer used in a process called <i>garbage collection</i></p>
 
-        Automaticity - when/why? (confusion) ([img](https://i.imgflip.com/2slo9z.png)) Sup! The JavaScript will handle this for me! Wrong!
-    </section>
-
-    <section class="slide compact">
-        <h2>JavaScript Memory life-cycle</h2>
-        <h3>in 3 easy steps</h3>
-
-        <ol>
-            <li class="next">allocate</li>
-            <li class="next">use</li>
-            <li class="next">release</li>
-        </ol>
+        <div class="double">
+            <p>JavaScript automatically allocates memory when objects are created.</p>
+            <p><strong>Garbage collection</strong> - is a process of automatically freeing memory when those objects are no longer used.</p>
+            <p class="next">JavaScript Memory life-cycle:</p>
+            <ol>
+                <li class="next">allocate</li>
+                <li class="next">use</li>
+                <li class="next">release</li>
+            </ol>
+        </div>
     </section>
 
     <section class="slide compact">
         <h2>Step 1: Allocate</h2>
 
-        <p>JavaScript automatically allocate memory when values are initially declared:</p>
-
         <ul>
-            <li>primitives like <code>Number</code> or <code>String</code></li>
-            <li>for <code>Object</code> & <code>Array</code> - for the object/array and contained values</li>
+            <li>Initial declaration of primitives (like <code>Number</code> or <code>String</code>)/</li>
+            <li>For <code>Object</code> & <code>Array</code> - it also allocates memory for contained values.</li>
             <li>Function declaration (<code>() => {}</code>) allocates a callable object (<code>Function</code>)</li>
-            <li>Object creation <code>new Foo()</code>, <code>new Date()</code>, etc...</li>
-            <li>Element creation - <code>document.createElement( 'div' )</code></li>
-            <li>array and string methods like <code>array.concat( otherArray )</code>, <code>'JavaScript'.substr( 0, 4 )</code></li>
+            <li>Object creation <code>new Foo()</code>, <code>new Date()</code>, etc.</li>
+            <li>Element creation - <code>document.createElement( 'div' ).</code></li>
+            <li>Array and string manuipulation methods: <code>array.concat( otherArray )</code>, <code>'JavaScript'.substr( 0, 4 )</code>,
+                etc.
+            </li>
         </ul>
 
     </section>
@@ -88,7 +84,10 @@
     <section class="slide compact">
         <h2>Step 2: Use</h2>
 
-        <p>...</p>
+        <figure  class="place bottom">
+            <img src="images/gifs/source.gif" width="450">
+            <figcaption class="white">Source <a href="https://giphy.com/gifs/cat-pizza-lazers-zdzG4ByVrd1V6?utm_source=media-link&utm_medium=landing&utm_campaign=Media%20Links&utm_term=">giphy</a>.</figcaption>
+        </figure>
     </section>
 
     <section class="slide compact">
