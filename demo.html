@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta charset="UTF-8">
+	<title>Memory leaks demo</title>
+</head>
+<body>
+
+<input type="button" id="ml-global" value="Global">
+<input type="button" id="ml-interval" value="Interval">
+<input type="button" id="ml-intermediate" value="Intermediate">
+<input type="button" id="ml-forgotten-dom" value="Forgotten DOM">
+<input type="button" id="ml-closures" value="Closures">
+<input type="button" id="ml-detached-nodes" value="Detached nodes">
+<input type="button" id="ml-console" value="Console">
+<br>
+<br>
+<div id="a-div">I'm a div</div>
+
+<script type="application/javascript">
+	class BigObject {
+		constructor() {
+			this.data = Array( 100000 ).map( () => 'x' );
+		}
+	}
+
+	document.getElementById( 'ml-global' ).addEventListener( 'click', () => {
+		// window.bo = new BigObject();
+		// bo = new BigObject();
+		this.bo = new BigObject(); // this === window
+	} );
+</script>
+
+<script type="application/javascript">
+	document.getElementById( 'ml-interval' ).addEventListener( 'click', () => {
+		const bo = new BigObject();
+
+		setInterval( () => {
+			console.log( bo[ 3 ] );
+		}, 500 );
+	} );
+</script>
+
+<script type="application/javascript">
+	document.getElementById( 'ml-intermediate' ).addEventListener( 'click', () => {
+		const config = {
+			bo: new BigObject(),
+			foo: 'bar',
+			interval: 1000
+		};
+
+		logSomething( config );
+		// logSomethingBetter( config.foo, config.interval );
+		// Also OK:
+		// const { foo, interval } = config;
+		// logSomething( { foo, interval } );
+		// logSomethingOKish( config );
+	} );
+
+	function logSomething( config ) {
+		setInterval( () => {
+			console.log( config.foo );
+		}, 1000 );
+	}
+
+	function logSomethingBetter( foo, interval ) {
+		setInterval( () => {
+			console.log( foo );
+		}, interval );
+	}
+
+	function logSomethingOKish( { foo, interval } ) {
+		setInterval( () => {
+			console.log( foo );
+		}, interval );
+	}
+</script>
+
+<script type="application/javascript">
+	const myStuff = {};
+
+	document.getElementById( 'ml-forgotten-dom' ).addEventListener( 'click', () => {
+		const button = document.createElement( 'input' );
+		button.id = 'click-me';
+		button.type = 'button';
+		button.value = 'click me!';
+		button._bo = new BigObject();
+
+		myStuff.button = button;
+
+		document.body.appendChild( button );
+
+		button.addEventListener( 'click', removeButton );
+
+		function removeButton() {
+			document.body.removeChild( document.getElementById( 'click-me' ) );
+			button.removeEventListener( 'click', removeButton );
+		}
+	} );
+</script>
+
+<script type="application/javascript">
+	let theThing = null;
+
+	function replaceThing() {
+		const originalThing = theThing;
+
+		function unused() {
+			// This... is never used but scopes...
+			if ( originalThing ) {
+				console.log( 'Hello there!' );
+			}
+		}
+
+		theThing = {
+			bo: new BigObject(),
+			someMethod: function() {
+				// Does not use originalThing could be GCed but unused is using and as both useses the same lexical scope... bang
+				console.log( 'Some method...' );
+			}
+		};
+	}
+
+	document.getElementById( 'ml-closures' ).addEventListener( 'click', replaceThing );
+</script>
+
+<script type="application/javascript">
+	const node = document.getElementById( 'a-div' );
+
+	function detachNode() {
+		node.remove();
+	}
+
+	document.getElementById( 'ml-detached-nodes' ).addEventListener( 'click', detachNode );
+</script>
+
+
+<script type="application/javascript">
+	document.getElementById( 'ml-console' ).addEventListener( 'click', () => {
+		const bo = new BigObject();
+
+		console.log( bo );
+	} );
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+
+.slide ul {
+    margin-left: 1em;
+}
+
+.slide .reference {
+    font-size: 0.8em;
+}
+
+.slide .reference a {
+    color: #555;
+}
+
+.slide pre code {
+    width: auto;
+}
