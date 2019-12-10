@@ -90,82 +90,89 @@
         </figure>
     </section>
 
-    <section class="slide compact">
+    <section class="slide prism">
         <h2>Step 3: Release</h2>
 
-        <p>How do Garbage Collector decides if some memory is not needed anymore?</p>
+        <div class="double">
+            <p>The <i>Garbage collector</i> finds the memory which is no longer need.</p>
 
-        Reference - one object reference another if the former has access to the latter (implicitly or explicitly).
-
-        - implicitly - ie to its prototype
-        - to its properties values
-
-        <p>This means that object in memory management is considered with it function or lexical scope (so what's visible in current
-            position
-            in execution stack).</p>
-        <!-- TODO -->
-        ## How JavaScript detects memory to free?
-
-        Meet the "Mark-and-sweep algorithm"
-
-        IMG
-
-        The "object no longer needed" is an "unreachable object".
-
-        We assume well-known set of objects "roots". In JavaScript it is the *global* object (AKA window).
-
-        The M&S periodically start from a root and find all objects referenced from these roots, then objects referenced by these and so on.
-
-        When going from root to all objects the Garbage Collector will find all non-reachable.
-
-        All modern browsers comes with mark-and-sweep garbage collector (with some improvements - but the general idea of an object that is
-        no longer need stays the same.
-
-        function foo() {
-        const x = "foo";
-        return "baz";
-        }
-
-        foo();
-    </section>
-
-    <section class="slide compact">
-        <h2>Releasing the memory</h2>
+            <p>All modern browsers uses the "mark-and-sweep" algorithm to detect objects that are no longer needed. The "object no longer
+                needed" is an "unreachable object".</p>
+            <figure>
+                <img src="images/dontcontrol.png" width="450">
+                <figcaption class="white reference">Source <a
+                    href="https://developers.google.com/web/tools/chrome-devtools/memory-problems/memory-101">Google Tools for Web
+                    Developers: Memory Terminology.</a>.
+                </figcaption>
+            </figure>
+        </div>
         <blockquote>
-            <p>As of 2019 We cannot release memory manually (call garbage collector).</p>
-        </blockquote>
 
-        <p>That's true, but:</p>
-        <ul>
-            <li>In Node.js you can increase heap memory <code>node --max-old-space-size=9001 index.js</code>.</li>
-            <li>For Chrome there's <code>--expose gc</code> flag for exposing <code>window.gc()</code> method.</li>
-        </ul>
+            <p>As of 2019 We cannot release memory manually (call the garbage collector).</p>
+        </blockquote>
     </section>
 
     <section class="slide compact">
         <h2>Common causes of memory leaks</h2>
 
         <ul>
-            <li>globals</li>
-            <li>globals!</li>
-            <li>shared lexical scope</li>
-            <li>forgotten callbacks</li>
-            <li>forgotten DOM nodes</li>
+            <li class="next">Reference in global objects.</li>
+            <li class="next">Forgotten event listeners & callbacks.</li>
+            <li class="next">Referenced, detached DOM nodes.</li>
+            <li class="next">Variables and closures in shared lexical scope.</li>
         </ul>
+
+        <p class="next">But only if those are not needed by the application at given time. Otherwise those are valid objects.</p>
     </section>
 
     <section class="slide compact">
-        <h2>Tools - how to find memory leaks</h2>
+        <h2>Available Tools</h2>
 
         <ul>
             <li>Google Chrome dev tools - memory tab</li>
             <li>Firefox dev tool - memory tab</li>
-            <li><code>window.performance.memory</code></li>
+            <li>Use <code>window.performance.memory</code> to programmatically read used memory.</li>
         </ul>
+
+        <figure>
+            <img src="images/window_preformance_memory.png" width="572" alt="">
+        </figure>
+    </section>
+
+    <section class="slide compact">
+        <h2>Firefox dev tools</h2>
+
+        <figure>
+            <img src="images/ff_dev_tools.png" width="800" alt="">
+        </figure>
+    </section>
+
+    <section class="slide compact">
+        <h2>Chrome dev tools</h2>
+
+        <figure>
+            <img src="images/chrome_dev_tools.png" width="850" alt="">
+        </figure>
     </section>
 
     <section class="slide prism">
-        <h2>Memory leaks: Accidental global</h2>
+        <h2>Running the tools</h2>
+
+        <p>Run your browser with all features striped down.</p>
+
+        <pre>
+            <code class="language-javascript line-numbers">
+                google-chrome \
+                    --disable-extensions \
+                    --disable-plugins \
+                    --incognito
+                    http://example.com
+            </code>
+        </pre>
+    </section>
+
+    <section class="slide prism">
+        <h3>Example: Accidental global (<a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>)</h3>
         <pre style="font-size: 30px;" class="language-javascript line-numbers">
             <code>
                 document.getElementById( 'ml-global' )
@@ -176,108 +183,69 @@
                     } );
             </code>
         </pre>
-        <a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>
     </section>
 
     <section class="slide prism">
-        <h2>Memory leaks: Intermediate values</h2>
+        <h3>Example: Intermediate values (<a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>)</h3>
         <pre style="font-size: 30px;" class="language-javascript line-numbers">
-            <code>
-                const config = {
-                    bo: new BigObject(), // used somewhere else
-                    foo: 'bar',
-                    interval: 1000
-                };
+            <code style="line-height: 1.5em;">
+                const config = { bo: new BigObject(), foo: 'bar',
+                    interval: 1000 };
 
                 logSomething( config );
 
                 function logSomething( config ) {
-                    // Also don't forget your intervals!
-                    setInterval( () => {
+                    setInterval( () => { // Also: calback!
                         console.log( config.foo );
                     }, config.interval );
                 }
             </code>
         </pre>
-        <a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>
     </section>
 
     <section class="slide prism">
-        <h2>Memory leaks: Shared lexical scope</h2>
-        <pre style="font-size: 30px;" class="language-javascript line-numbers">
-            <code>
+        <h3>Example: Shared lexical scope (<a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>) <span class="reference"> from <a
+            href="https://blog.meteor.com/an-interesting-kind-of-javascript-memory-leak-8b47d2e7f156"
+            target="_blank" rel="noopener noreferrer">An interesting kind of JavaScript memory leak</a>.</span></h3>
+        <pre style="font-size: 24px;" class="language-javascript line-numbers">
+            <code style="line-height: 1.5em;">
                 let theThing = null;
-
                 function replaceThing() {
                     const originalThing = theThing;
-
                     function unused() {
                         if ( originalThing ) {
-                            console.log( 'Hello there!' );
+                            // ...
                         }
                     }
-
                     theThing = {
                         bo: new BigObject(),
                         someMethod: function() {
-                            console.log( 'Some method...' );
+                            // ...
                         }
                     };
                 }
             </code>
         </pre>
-        <a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>
     </section>
 
     <section class="slide prism">
-        <h2>Memory leaks: Forgotten DOM nodes</h2>
-        <pre style="font-size: 30px;" class="language-javascript line-numbers">
-            <code>
-                const myStuff = {};
-
-                document.getElementById( 'ml-forgotten-dom' ).addEventListener( 'click', () => {
-                    const button = document.createElement( 'input' );
-                    button.type = 'button';
-                    button._bo = new BigObject();
-
-                    myStuff.button = button;
-
-                    document.body.appendChild( button );
-
-                    button.addEventListener( 'click', removeButton );
-
-                    function removeButton() {
-                        document.body.removeChild( document.getElementById( 'click-me' ) );
-                        button.removeEventListener( 'click', removeButton );
-                    }
-                } );
-            </code>
-        </pre>
-        <a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>
-
-        <p class="reference">Ref: <a href="https://blog.meteor.com/an-interesting-kind-of-javascript-memory-leak-8b47d2e7f156"
-                                     target="_blank" rel="noopener noreferrer">An interesting kind of JavaScript memory leak</a>.</p>
-    </section>
-
-    <section class="slide prism">
-        <h2>Memory leaks: Forgotten stuff...</h2>
-        <pre style="font-size: 30px;" class="language-javascript line-numbers">
-            <code>
+        <h3>Example: Forgotten stuff (<a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>)</h3>
+        <pre style="font-size: 24px;" class="language-javascript line-numbers">
+            <code style="line-height: 1.6em;">
                 const bo = new BigObject();
-                const node = document.getElementById( 'a-div' );
+                bo.node = document.getElementById( 'a-div' )
 
                 function detachNode() {
-                    node.remove();
+                    document.getElementById( 'a-div' ).remove(); // Removes from the DOM
                 }
 
-                setInterval( () => {
+                setInterval( () => { // Interval is not cleared
                     console.log( bo[ 3 ] );
                 }, 500 );
 
-                console.log( bo );
+                console.log( bo ); // bo resides in console GC root
             </code>
         </pre>
-        <a href="demo.html" target="_blank" rel="noopener noreferrer">Demo</a>
     </section>
 
     <section class="slide compact">
@@ -285,301 +253,13 @@
 
         <ul>
             <li>be careful with anonymous functions for callbacks (if scope is shared)</li>
-            <li>pass only what you need - big objects - retentions</li>
+            <li>pass only what you need - big objects - big retentions</li>
             <li>de-register callbacks</li>
             <li>consider using `WeakMap` instead of `Map`</li>
             <li>GC must pause execution to collect garbage - so if you experience lags - it might be this.</li>
             <li>if in doubt - measure</li>
             <li>when testing - disable all addons</li>
         </ul>
-    </section>
-
-    <section class="slide prism">
-        <h2>Disabling addons - Chrome</h2>
-
-        <pre>
-            <code class="language-javascript line-numbers">
-            google-chrome \
-                --enable-precise-memory-info \
-                --disable-extensions \
-                --disable-plugins \
-                --incognito
-                http://example.com</code>
-        </pre>
-    </section>
-
-    <section class="slide prism">
-        <h2>Disabling addons - Firefox</h2>
-
-        <pre>
-            <code class="language-javascript line-numbers">
-            firefox \
-                -P "empty" \
-                --new-instance \
-                --safe-mode \
-                http://localhost:8125
-            </code>
-        </pre>
-    </section>
-
-    <section class="slide compact">
-        <h2>List Navigation</h2>
-        <ol>
-            <li>Ennui keffiyeh thundercats</li>
-            <li class="next">Jean shorts biodiesel</li>
-            <li class="next">Terry richardson, swag blog</li>
-            <li class="next">Locavore umami vegan helvetica</li>
-            <li class="next">Fingerstache kale chips</li>
-        </ol>
-        <p class="next">Before they sold out master</p>
-    </section>
-
-    <section class="slide compact">
-        <h2>Slide Header</h2>
-
-        <p>Echo Park 8-bit sustainable umami deep v Kickstarter. DIY cliche typewriter brunch, Odd Future sriracha pickled aesthetic. Farm-to-table bespoke fingerstache, kale chips umami brunch letterpress.</p>
-        <p>Whatever authentic disrupt, you probably haven't heard of them direct trade mlkshk Etsy. Gluten-free roof party plaid four loko quinoa.</p>
-        <p class="note">Echo Park 8-bit sustainable umami deep v Kickstarter.</p>
-    </section>
-
-    <section class="slide compact">
-        <h2>Inline Elements</h2>
-
-        <p>Retro meh brunch <a href="">aesthetic</a> Cosby sweater Shoreditch. Banksy Tumblr
-            <strong>sriracha</strong>, flexitarian pug chia master cleanse vinyl
-            <em>wayfarers</em> fanny pack bespoke Helvetica <b>roof</b> party. Messenger bag retro cred
-            <i>Portland</i> next level. Yr stumptown Schlitz Carles deep v small batch. Hella sustainable messenger bag,
-            <mark>leggings</mark>
-            skateboard literally<sup>1</sup> bicycle rights H<sub>2</sub>0 mumblecore banh mi DIY VHS. Semiotics four loko street art asymmetrical. Asymmetrical
-            <code>&lt;paleo&gt;</code> you probably haven’t heard of.
-        </p>
-
-        <footer class="footer">
-            <p>Retro meh brunch <a href="">aesthetic</a> Cosby sweater Shoreditch. Banksy Tumblr
-                <strong>sriracha</strong>, flexitarian pug chia master cleanse vinyl
-                <em>wayfarers</em> fanny pack bespoke Helvetica <b>roof</b> party. Messenger bag retro cred
-                <i>Portland</i> next level. Yr stumptown Schlitz Carles deep v small batch. Hella sustainable messenger bag,
-                <mark>leggings</mark>
-                skateboard literally<sup>1</sup> bicycle rights H<sub>2</sub>0 mumblecore banh mi DIY VHS. Semiotics four loko street art asymmetrical. Asymmetrical
-                <code>&lt;paleo&gt;</code> you probably haven’t heard of.
-            </p>
-        </footer>
-    </section>
-
-    <section class="slide compact">
-        <h2>Columns</h2>
-        <p class="double">Echo Park 8-bit sustainable umami deep v Kickstarter. DIY cliche typewriter brunch, Odd Future sriracha pickled aesthetic. Farm-to-table bespoke fingerstache, kale chips umami brunch American Apparel letterpress. Whatever authentic disrupt, you probably haven't heard of them direct trade mlkshk Etsy. Gluten-free roof party plaid American Apparel four loko quinoa. Echo Park 8-bit sustainable.</p>
-    </section>
-
-    <section class="slide">
-        <h2>Quotes</h2>
-        <blockquote>
-            <p>Flannel bicycle rights locavore selfies skateboard. Authentic fanny pack paleo four loko bespoke. Artisan tattooed chia XOXO ennui, lomo disrupt 8-bit art party Tumblr scenester.</p>
-        </blockquote>
-        <figure>
-            <blockquote>
-                <p>Post-ironic fashion axe flexitarian, Tonx narwhal messenger bag Tumblr. Portland gentrify deep v kale chips literally.</p>
-            </blockquote>
-            <figcaption>Yours Truly</figcaption>
-        </figure>
-    </section>
-
-    <section class="slide compact">
-        <h2>Nested Lists</h2>
-        <ol>
-            <li>Literally viral vegan, ugh drinking vinegar photo booth</li>
-            <li>Wes Anderson chillwave Marfa pour-over Etsy banh mi</li>
-            <li>Ethnic polaroid lo-fi iPhone ennui
-                <ul>
-                    <li>Yr wayfarers before they sold out Kickstarter asymmetrical</li>
-                    <li>Irony flexitarian readymade quinoa, kogi bespoke meggings narwhal</li>
-                    <li>Skateboard Etsy twee artisan Echo Park</li>
-                </ul>
-            </li>
-            <li>Tonx kitsch fingerstache readymade, retro single-origin coffee</li>
-        </ol>
-    </section>
-
-    <section class="slide compact">
-        <h2>Simple Table</h2>
-        <table>
-            <tr>
-                <th scope="col">Gentrify</th>
-                <th>Twee</th>
-                <th>Artisan</th>
-                <th>Banksy</th>
-            </tr>
-            <tr>
-                <th scope="row">Messenger</th>
-                <td>Mixtape</td>
-                <td>Small batch</td>
-                <td>Bicycle rights</td>
-            </tr>
-            <tr>
-                <th scope="row">Meggings</th>
-                <td>Freegan</td>
-                <td>Retro biodiesel</td>
-                <td>Slow-carb</td>
-            </tr>
-            <tr>
-                <th scope="row">Vegan</th>
-                <td>Occupy</td>
-                <td>Normcore</td>
-                <td>Put a bird on it</td>
-            </tr>
-            <tr>
-                <th scope="row">Next level</th>
-                <td>Selfies</td>
-                <td>Sustainable</td>
-                <td>Organic</td>
-            </tr>
-            <tr>
-                <th scope="row">Umami</th>
-                <td>Asymmetrical</td>
-                <td>Keytar</td>
-                <td>Craft beer</td>
-            </tr>
-            <tr>
-                <th scope="row">Biodiesel</th>
-                <td>Haven’t heard</td>
-                <td>Skateboard</td>
-                <td>Farm-to-table</td>
-            </tr>
-        </table>
-    </section>
-
-    <section class="slide compact">
-        <h2>Striped Table</h2>
-        <table class="striped">
-            <tr>
-                <th scope="col">Gentrify</th>
-                <th>Twee</th>
-                <th>Artisan</th>
-                <th>Banksy</th>
-            </tr>
-            <tr>
-                <th scope="row">Messenger</th>
-                <td>Mixtape</td>
-                <td>Small batch</td>
-                <td>Bicycle rights</td>
-            </tr>
-            <tr>
-                <th scope="row">Meggings</th>
-                <td>Freegan</td>
-                <td>Retro biodiesel</td>
-                <td>Slow-carb</td>
-            </tr>
-            <tr>
-                <th scope="row">Vegan</th>
-                <td>Occupy</td>
-                <td>Normcore</td>
-                <td>Put a bird on it</td>
-            </tr>
-            <tr>
-                <th scope="row">Next level</th>
-                <td>Selfies</td>
-                <td>Sustainable</td>
-                <td>Organic</td>
-            </tr>
-            <tr>
-                <th scope="row">Umami</th>
-                <td>Asymmetrical</td>
-                <td>Keytar</td>
-                <td>Craft beer</td>
-            </tr>
-            <tr>
-                <th scope="row">Biodiesel</th>
-                <td>Haven’t heard</td>
-                <td>Skateboard</td>
-                <td>Farm-to-table</td>
-            </tr>
-        </table>
-    </section>
-
-    <section class="slide prism">
-        <h2>Listing Slide</h2>
-
-        <pre style="font-size: 45px;" class="language-javascript line-numbers">
-            <code>
-                function wrap(value) {
-                    return function () {
-                        return value;
-                    }
-                }
-
-                function bind(monad, f) {
-                    return f(monad());
-                }
-            </code>
-        </pre>
-    </section>
-
-    <section class="slide prism">
-        <pre style="font-size: 30px;" class="language-javascript line-numbers">
-            <code>
-                var monad = wrap('cookie');
-                bind(monad, (value) => {
-                    console.info(value);
-                    return wrap(value);
-                });
-                monad = bind(monad, (value) => {
-                    return wrap({ type: value });
-                });
-                bind(monad, (value) => {
-                    console.log(value);
-                    return wrap(value);
-                });
-            </code>
-        </pre>
-    </section>
-
-    <section class="slide">
-        <h2 class="shout"><a href="">Linked</a> Shout</h2>
-    </section>
-
-    <section class="slide">
-        <h2 class="shout grow">Effect: Growing Shout</h2>
-    </section>
-
-    <section class="slide">
-        <h2 class="shout shrink">Effect: Shrinking Shout</h2>
-    </section>
-
-    <section class="slide">
-        <figure>
-            <img class="cover" src="vendors/shower-ribbon/pictures/exact.png" alt="">
-            <figcaption class="white">Copyright © 2016 <a href="">Yours Truly</a>, Famous Inc.</figcaption>
-        </figure>
-    </section>
-
-    <section class="slide">
-        <img class="cover" src="vendors/shower-ribbon/pictures/tall.png" alt="">
-    </section>
-
-    <section class="slide">
-        <img class="cover" src="vendors/shower-ribbon/pictures/wide.png" alt="">
-    </section>
-
-    <section class="slide white">
-        <img class="place top left" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place top" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place top right" src="vendors/shower-ribbon/pictures/square.png" alt="">
-
-        <img class="place left" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place right" src="vendors/shower-ribbon/pictures/square.png" alt="">
-
-        <img class="place bottom left" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place bottom" src="vendors/shower-ribbon/pictures/square.png" alt="">
-        <img class="place bottom right" src="vendors/shower-ribbon/pictures/square.png" alt="">
-    </section>
-
-    <section class="slide" data-timing="00:03">
-        <h3 class="shout">Automatic switch slide after <strong>3 secs</strong> ...</h3>
-    </section>
-
-    <section class="slide">
-        <img class="cover" src="images/gifs/example-gif.gif" width="480" height="360" alt=""/>
     </section>
 
     <section class="slide">
