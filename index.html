@@ -282,7 +282,7 @@
             <li>Be careful with anonymous functions for callbacks (if the scope is shared).</li>
             <li>Pass only what you need to functions.</li>
             <li>De-register callbacks (use named functions).</li>
-            <li>Consider using <code>WeakMap</code> instead of <code>Map</code>.</li>
+            <li>Consider using <code>WeakMap</code> or <code>WeakSet</code>.</li>
             <li>GC must pause execution to collect memory.</li>
             <li>Measure, when testing - disable all addons.</li>
             <li class="next">Hidden garbage collector: <code>google-chrome -js-flags="--expose-gc"</code> - <code>window.gc()</code>.</li>
