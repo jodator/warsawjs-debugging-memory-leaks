@@ -56,7 +56,7 @@
         <div class="double">
             <p>JavaScript automatically allocates memory when objects are created.</p>
             <p><strong>Garbage collection</strong> - is a process of automatically freeing memory when those objects are no longer used.</p>
-            <p class="next">JavaScript Memory life-cycle:</p>
+            <p class="next">Memory life-cycle:</p>
             <ol>
                 <li class="next">allocate</li>
                 <li class="next">use</li>
@@ -69,13 +69,13 @@
         <h2>Step 1: Allocate</h2>
 
         <ul>
-            <li>Initial declaration of primitives (like <code>Number</code> or <code>String</code>)/</li>
+            <li>Initial declaration of primitives (like <code>Number</code> or <code>String</code>).</li>
             <li>For <code>Object</code> & <code>Array</code> - it also allocates memory for contained values.</li>
-            <li>Function declaration (<code>() => {}</code>) allocates a callable object (<code>Function</code>)</li>
+            <li>Function declaration (<code>() => {}</code>) allocates a callable object (<code>Function</code>).</li>
             <li>Object creation <code>new Foo()</code>, <code>new Date()</code>, etc.</li>
-            <li>Element creation - <code>document.createElement( 'div' ).</code></li>
+            <li>Element creation - <code>document.createElement( 'div' )</code>.</li>
             <li>Array and string manuipulation methods: <code>array.concat( otherArray )</code>, <code>'JavaScript'.substr( 0, 4 )</code>,
-                etc.
+                ...
             </li>
         </ul>
 
@@ -101,7 +101,7 @@
                 <img src="images/dontcontrol.png" width="450">
                 <figcaption class="white reference">Source <a
                     href="https://developers.google.com/web/tools/chrome-devtools/memory-problems/memory-101">Google Tools for Web
-                    Developers: Memory Terminology.</a>.
+                    Developers: Memory Terminology</a>.
                 </figcaption>
             </figure>
         </div>
@@ -138,6 +138,22 @@
         </figure>
     </section>
 
+    <section class="slide prism">
+        <h2>Using the tools - preparation</h2>
+
+        <p>Run your browser with all features striped down.</p>
+
+        <pre>
+            <code class="language-javascript line-numbers">
+                google-chrome \
+                    --disable-extensions \
+                    --disable-plugins \
+                    --incognito
+                    http://example.com
+            </code>
+        </pre>
+    </section>
+
     <section class="slide compact">
         <h2>Firefox dev tools</h2>
 
@@ -157,20 +173,13 @@
         </figure>
     </section>
 
-    <section class="slide prism">
-        <h2>Running the tools</h2>
+    <section class="slide compact">
+        <h2>Live debugging</h2>
 
-        <p>Run your browser with all features striped down.</p>
-
-        <pre>
-            <code class="language-javascript line-numbers">
-                google-chrome \
-                    --disable-extensions \
-                    --disable-plugins \
-                    --incognito
-                    http://example.com
-            </code>
-        </pre>
+        <figure  class="place bottom">
+            <img src="images/gifs/debug.gif" width="400">
+            <figcaption class="white">Source <a href="https://giphy.com/gifs/6gTbmSzezq5Dq/media">giphy</a>.</figcaption>
+        </figure>
     </section>
 
     <section class="slide prism">
