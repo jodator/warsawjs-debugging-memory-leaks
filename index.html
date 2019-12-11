@@ -96,8 +96,7 @@
         <div class="double">
             <p>The <i>Garbage collector</i> finds the memory which is no longer need.</p>
 
-            <p>All modern browsers uses the "mark-and-sweep" algorithm to detect objects that are no longer needed. The "object no longer
-                needed" is an "unreachable object".</p>
+            <p>All modern browsers uses the "mark-and-sweep" algorithm to detect objects that are no longer needed by finding "unreachable objects".</p>
             <figure>
                 <img src="images/dontcontrol.png" width="450">
                 <figcaption class="white reference">Source <a
@@ -142,8 +141,11 @@
     <section class="slide compact">
         <h2>Firefox dev tools</h2>
 
-        <figure>
+        <figure class="place">
             <img src="images/ff_dev_tools.png" width="800" alt="">
+        </figure>
+        <figure class="place next">
+            <img src="images/ff_dev_tools_better.png" width="800" alt="">
         </figure>
     </section>
 
@@ -255,7 +257,7 @@
             <li>be careful with anonymous functions for callbacks (if scope is shared)</li>
             <li>pass only what you need - big objects - big retentions</li>
             <li>de-register callbacks</li>
-            <li>consider using `WeakMap` instead of `Map`</li>
+            <li>consider using <code>WeakMap</code> instead of <code>Mad</code></li>
             <li>GC must pause execution to collect garbage - so if you experience lags - it might be this.</li>
             <li>if in doubt - measure</li>
             <li>when testing - disable all addons</li>
