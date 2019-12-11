@@ -279,13 +279,13 @@
         <h2>ProTips™</h2>
 
         <ul>
-            <li>be careful with anonymous functions for callbacks (if scope is shared)</li>
-            <li>pass only what you need - big objects - big retentions</li>
-            <li>de-register callbacks</li>
-            <li>consider using <code>WeakMap</code> instead of <code>Mad</code></li>
-            <li>GC must pause execution to collect garbage - so if you experience lags - it might be this.</li>
-            <li>if in doubt - measure</li>
-            <li>when testing - disable all addons</li>
+            <li>Be careful with anonymous functions for callbacks (if the scope is shared).</li>
+            <li>Pass only what you need to functions.</li>
+            <li>De-register callbacks</li>
+            <li>Consider using <code>WeakMap</code> instead of <code>Map</code>.</li>
+            <li>GC must pause execution to collect memory.</li>
+            <li>Measure, when testing - disable all addons.</li>
+            <li class="next">Hidden garbage collector: <code>google-chrome -js-flags="--expose-gc"</code> - <code>window.gc()</code>.</li>
         </ul>
     </section>
 
