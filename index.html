@@ -130,12 +130,36 @@
         <ul>
             <li>Google Chrome dev tools - memory tab.</li>
             <li>Firefox dev tool - memory tab.</li>
-            <li>Use <code>window.performance.memory</code> to programmatically read used memory.</li>
+            <li>To programmatically read used memory use:
+                <ul>
+                    <li><code>performance.memory</code></li>
+                    <li><code>performance.memoryMeasure()</code>🆕</li>
+                </ul>
+            </li>
         </ul>
 
         <figure>
             <img src="images/window_preformance_memory.png" width="572" alt="">
         </figure>
+    </section>
+
+    <section class="slide compact">
+        <h2><code>performance.memoryMeasure()</code></h2>
+
+        <ul>
+            <li>New in Chrome 83</li>
+            <li>Detailed information about total page memory attributions.</li>
+            <li>To experiment with <code>performance.measureMemory()</code> enable the <code>#experimental-web-platform-features</code> flag
+                in <code>chrome://flags</code>.
+            </li>
+        </ul>
+
+        <figure>
+            <img src="images/window_measure_memory.png" width="572" alt="">
+        </figure>
+
+        <a href="https://web.dev/monitor-total-page-memory-usage/">wed.dev/monitor-total-page-memory-usage</a>
+
     </section>
 
     <section class="slide prism">
@@ -148,7 +172,8 @@
                 google-chrome \
                     --disable-extensions \
                     --disable-plugins \
-                    --incognito
+                    --incognito \
+                    // --enable-blink-features='ForceEagerMeasureMemory' \
                     http://example.com
             </code>
         </pre>

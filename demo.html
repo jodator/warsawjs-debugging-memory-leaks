@@ -3,6 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Memory leaks demo</title>
+	<style>
+		body, input {
+			font-size: 20px;
+		}
+	</style>
 </head>
 <body>
 
@@ -17,6 +22,7 @@
 <br>
 <div id="a-div">I'm a div</div>
 
+<!-- Global -->
 <script type="application/javascript">
 	class BigObject {
 		constructor() {
@@ -31,6 +37,7 @@
 	} );
 </script>
 
+<!-- Interval -->
 <script type="application/javascript">
 	document.getElementById( 'ml-interval' ).addEventListener( 'click', () => {
 		const bo = new BigObject();
@@ -41,6 +48,7 @@
 	} );
 </script>
 
+<!-- Intermediate object -->
 <script type="application/javascript">
 	document.getElementById( 'ml-intermediate' ).addEventListener( 'click', () => {
 		const config = {
@@ -49,8 +57,8 @@
 			interval: 1000
 		};
 
-		logSomething( config );
-		// logSomethingBetter( config.foo, config.interval );
+		// logSomething( config );
+		logSomethingBetter( config.foo, config.interval );
 		// Also OK:
 		// const { foo, interval } = config;
 		// logSomething( { foo, interval } );
@@ -76,6 +84,7 @@
 	}
 </script>
 
+<!-- Forgotten DOM -->
 <script type="application/javascript">
 	const myStuff = {};
 
@@ -99,18 +108,19 @@
 	} );
 </script>
 
+<!-- Closuers -->
 <script type="application/javascript">
 	let theThing = null;
 
 	function replaceThing() {
 		const originalThing = theThing;
 
-		function unused() {
-			// This... is never used but scopes...
-			if ( originalThing ) {
-				console.log( 'Hello there!' );
-			}
-		}
+		// function unused() {
+		// 	// This... is never used but scopes...
+		// 	if ( originalThing ) {
+		// 		console.log( 'Hello there!' );
+		// 	}
+		// }
 
 		theThing = {
 			bo: new BigObject(),
@@ -124,6 +134,7 @@
 	document.getElementById( 'ml-closures' ).addEventListener( 'click', replaceThing );
 </script>
 
+<!-- Detached nodes -->
 <script type="application/javascript">
 	const node = document.getElementById( 'a-div' );
 
@@ -134,7 +145,7 @@
 	document.getElementById( 'ml-detached-nodes' ).addEventListener( 'click', detachNode );
 </script>
 
-
+<!-- Console -->
 <script type="application/javascript">
 	document.getElementById( 'ml-console' ).addEventListener( 'click', () => {
 		const bo = new BigObject();
@@ -142,7 +153,6 @@
 		console.log( bo );
 	} );
 </script>
-
 
 </body>
 </html>
